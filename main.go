@@ -1,0 +1,57 @@
+package main
+import(
+	"net/http"
+	"os"
+	"log"
+	"database/sql"
+	_ "github.com/lib/pq"
+	"github.com/joho/godotenv"
+	"github.com/ananyabhardwaj10/yournotes/internal/database"
+)
+
+type apiConfig struct {
+	db *database.Queries
+}
+
+func main() {
+	godotenv.Load()
+	dbUrl:= os.Getenv("DATABASE_URL")
+	db, err := sql.Open("postgres", dbUrl)
+	if err != nil {
+		log.Printf("error opening the database: %s", err)
+		os.Exit(1)
+	}
+
+	dbQueries := database.New(db)
+
+	mux := http.NewServeMux()
+
+	server := &http.Server{
+		Addr: ":8085",
+		Handler: mux,
+	}
+
+	mux.HandleFunc("GET /api/healthz", func(w http.ResponseWriter, req *http.Request) {
+		w.Header().Set("Content-Type", "text/plain; charset=utf-8")
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte("Working just fine"))
+	})
+
+	apiCfg := apiConfig{
+		db: dbQueries,
+	}
+
+	mux.HandleFunc("POST /api/register", apiCfg.handlerRegisterUser)
+	//login
+	//post refresh (refresh tokens)
+	
+	//Get notes
+	//get notes :id (single note)
+	//post notes 
+	//put notes :id
+	//delete notes :id
+
+
+
+	server.ListenAndServe()
+}
