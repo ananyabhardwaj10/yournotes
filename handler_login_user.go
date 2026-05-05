@@ -13,6 +13,7 @@ type response struct {
 	UpdatedAt time.Time `json:"updated_at"`
 	Name string  `json:"name"`
 	Email string `json:"email"`
+	Token string `json:"token"`
 }
 
 func (cfg *apiConfig) handlerLoginUser(w http.ResponseWriter, req *http.Request) {
@@ -43,12 +44,21 @@ func (cfg *apiConfig) handlerLoginUser(w http.ResponseWriter, req *http.Request)
 		return 
 	}
 
+	token, err := auth.MakeJWT(user.ID, cfg.jwtSecretKey, time.Hour)
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, "unable to create jwt", err)
+		return 
+	}
+
+
+
 	respondWithJSON(w, http.StatusOK, response{
 		ID: user.ID,
 		CreatedAt: user.CreatedAt,
 		UpdatedAt: user.UpdatedAt,
 		Name: user.Name,
 		Email: user.Email,
+		Token: token,
 	})
 
 }

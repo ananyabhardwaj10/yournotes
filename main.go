@@ -11,6 +11,7 @@ import(
 
 type apiConfig struct {
 	db *database.Queries
+	jwtSecretKey string
 }
 
 func main() {
@@ -23,6 +24,8 @@ func main() {
 	}
 
 	dbQueries := database.New(db)
+
+	jwtSecretKey := os.Getenv("JWT_SECRET_KEY")
 
 	mux := http.NewServeMux()
 
@@ -39,6 +42,7 @@ func main() {
 
 	apiCfg := apiConfig{
 		db: dbQueries,
+		jwtSecretKey: jwtSecretKey,
 	}
 
 	mux.HandleFunc("POST /api/register", apiCfg.handlerRegisterUser)
@@ -47,7 +51,7 @@ func main() {
 	
 	//Get notes
 	//get notes :id (single note)
-	//post notes 
+	mux.HandleFunc("POST /api/createnote", apiCfg.handlerCreateNote)
 	//put notes :id
 	//delete notes :id
 

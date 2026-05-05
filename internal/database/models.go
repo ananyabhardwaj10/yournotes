@@ -10,6 +10,15 @@ import (
 	"github.com/google/uuid"
 )
 
+type Note struct {
+	ID        uuid.UUID
+	CreatedAt time.Time
+	UpdatedAt time.Time
+	Body      string
+	UserID    uuid.UUID
+	Title     string
+}
+
 type User struct {
 	ID             uuid.UUID
 	CreatedAt      time.Time
