@@ -42,3 +42,39 @@ func (q *Queries) CreateNote(ctx context.Context, arg CreateNoteParams) (Note, e
 	)
 	return i, err
 }
+
+const getNotesByUserID = `-- name: GetNotesByUserID :many
+SELECT id, created_at, updated_at, body, user_id, title FROM notes
+WHERE user_id = $1
+ORDER BY created_at DESC
+`
+
+func (q *Queries) GetNotesByUserID(ctx context.Context, userID uuid.UUID) ([]Note, error) {
+	rows, err := q.db.QueryContext(ctx, getNotesByUserID, userID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Note
+	for rows.Next() {
+		var i Note
+		if err := rows.Scan(
+			&i.ID,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+			&i.Body,
+			&i.UserID,
+			&i.Title,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}

@@ -8,3 +8,8 @@ VALUES (
     $2,
     $3
 ) RETURNING *;
+
+-- name: GetNotesByUserID :many
+SELECT * FROM notes
+WHERE user_id = $1
+ORDER BY created_at DESC;
