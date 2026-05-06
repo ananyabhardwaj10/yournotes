@@ -47,7 +47,8 @@ func main() {
 
 	mux.HandleFunc("POST /api/register", apiCfg.handlerRegisterUser)
 	mux.HandleFunc("POST /api/login", apiCfg.handlerLoginUser)
-	//post refresh (refresh tokens)
+	mux.HandleFunc("POST /api/refresh", apiCfg.handlerRefreshTokens)
+	mux.HandleFunc("POST /api/revoke", apiCfg.handlerRevokeRefreshTokens)
 	
 	//Get notes
 	//get notes :id (single note)

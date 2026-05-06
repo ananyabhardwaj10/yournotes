@@ -5,6 +5,7 @@ import(
 	"encoding/json"
 	"github.com/google/uuid"
 	"github.com/ananyabhardwaj10/yournotes/internal/auth"
+	"github.com/ananyabhardwaj10/yournotes/internal/database"
 )
 
 type response struct {
@@ -14,6 +15,7 @@ type response struct {
 	Name string  `json:"name"`
 	Email string `json:"email"`
 	Token string `json:"token"`
+	RefreshToken string `json:"refresh_token"`
 }
 
 func (cfg *apiConfig) handlerLoginUser(w http.ResponseWriter, req *http.Request) {
@@ -50,6 +52,13 @@ func (cfg *apiConfig) handlerLoginUser(w http.ResponseWriter, req *http.Request)
 		return 
 	}
 
+	refreshToken := auth.MakeRefreshToken()
+
+	_, err = cfg.db.CreateRefreshToken(req.Context(), database.CreateRefreshTokenParams{
+		Token: refreshToken,
+		ExpiresAt: time.Now().UTC().Add(time.Hour * 24 * 30),
+		UserID: user.ID,
+	})
 
 
 	respondWithJSON(w, http.StatusOK, response{
@@ -59,6 +68,7 @@ func (cfg *apiConfig) handlerLoginUser(w http.ResponseWriter, req *http.Request)
 		Name: user.Name,
 		Email: user.Email,
 		Token: token,
+		RefreshToken: refreshToken,
 	})
 
 }

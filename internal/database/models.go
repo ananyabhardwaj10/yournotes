@@ -5,6 +5,7 @@
 package database
 
 import (
+	"database/sql"
 	"time"
 
 	"github.com/google/uuid"
@@ -17,6 +18,15 @@ type Note struct {
 	Body      string
 	UserID    uuid.UUID
 	Title     string
+}
+
+type RefreshToken struct {
+	Token     string
+	CreatedAt time.Time
+	UpdatedAt time.Time
+	ExpiresAt time.Time
+	UserID    uuid.UUID
+	RevokedAt sql.NullTime
 }
 
 type User struct {
