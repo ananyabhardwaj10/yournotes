@@ -7,6 +7,7 @@ package database
 
 import (
 	"context"
+	"database/sql"
 
 	"github.com/google/uuid"
 )
@@ -96,4 +97,40 @@ func (q *Queries) GetNotesByUserID(ctx context.Context, userID uuid.UUID) ([]Not
 		return nil, err
 	}
 	return items, nil
+}
+
+const updateNote = `-- name: UpdateNote :one
+UPDATE notes
+SET
+  title = COALESCE($1, title),
+  body = COALESCE($2, body),
+  updated_at = NOW()
+WHERE id = $3 AND user_id = $4
+RETURNING id, created_at, updated_at, body, user_id, title
+`
+
+type UpdateNoteParams struct {
+	Title  sql.NullString
+	Body   sql.NullString
+	ID     uuid.UUID
+	UserID uuid.UUID
+}
+
+func (q *Queries) UpdateNote(ctx context.Context, arg UpdateNoteParams) (Note, error) {
+	row := q.db.QueryRowContext(ctx, updateNote,
+		arg.Title,
+		arg.Body,
+		arg.ID,
+		arg.UserID,
+	)
+	var i Note
+	err := row.Scan(
+		&i.ID,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.Body,
+		&i.UserID,
+		&i.Title,
+	)
+	return i, err
 }

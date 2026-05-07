@@ -53,7 +53,7 @@ func main() {
 	mux.HandleFunc("GET /api/notes", apiCfg.handlerGetAllNotes)
 	mux.HandleFunc("GET /api/notes/{noteID}", apiCfg.handlerGetSingleNote)
 	mux.HandleFunc("POST /api/createnote", apiCfg.handlerCreateNote)
-	//put notes :id
+	mux.HandleFunc("PATCH /api/notes/{noteID}", apiCfg.handlerUpdateNote)
 	//delete notes :id
 
 
