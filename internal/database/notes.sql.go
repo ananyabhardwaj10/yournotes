@@ -43,6 +43,25 @@ func (q *Queries) CreateNote(ctx context.Context, arg CreateNoteParams) (Note, e
 	return i, err
 }
 
+const getNoteByID = `-- name: GetNoteByID :one
+SELECT id, created_at, updated_at, body, user_id, title FROM notes
+WHERE id = $1
+`
+
+func (q *Queries) GetNoteByID(ctx context.Context, id uuid.UUID) (Note, error) {
+	row := q.db.QueryRowContext(ctx, getNoteByID, id)
+	var i Note
+	err := row.Scan(
+		&i.ID,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.Body,
+		&i.UserID,
+		&i.Title,
+	)
+	return i, err
+}
+
 const getNotesByUserID = `-- name: GetNotesByUserID :many
 SELECT id, created_at, updated_at, body, user_id, title FROM notes
 WHERE user_id = $1

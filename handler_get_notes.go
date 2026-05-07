@@ -49,3 +49,27 @@ func (cfg *apiConfig) handlerGetAllNotes(w http.ResponseWriter, req *http.Reques
 
 	respondWithJSON(w, http.StatusOK, allNotes)
 }
+
+func (cfg *apiConfig) handlerGetSingleNote(w http.ResponseWriter, req *http.Request) {
+	noteIDStr := req.PathValue("noteID")
+	noteID, err := uuid.Parse(noteIDStr)
+	if err != nil {
+		respondWithError(w, http.StatusBadRequest, "Unable to get note id from path", err)
+		return 
+	}
+
+	note, err := cfg.db.GetNoteByID(req.Context(), noteID)
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, "Unable to get note using id", err)
+		return 
+	}
+
+	respondWithJSON(w, http.StatusOK, NoteResp{
+		ID: note.ID,
+		UserID: note.UserID,
+		Title: note.Title,
+		Contents: note.Body,
+		CreatedAt: note.CreatedAt,
+		UpdatedAt: note.UpdatedAt,
+	})
+}

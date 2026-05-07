@@ -13,3 +13,7 @@ VALUES (
 SELECT * FROM notes
 WHERE user_id = $1
 ORDER BY created_at DESC;
+
+-- name: GetNoteByID :one
+SELECT * FROM notes
+WHERE id = $1;

@@ -51,7 +51,7 @@ func main() {
 	mux.HandleFunc("POST /api/revoke", apiCfg.handlerRevokeRefreshTokens)
 	
 	mux.HandleFunc("GET /api/notes", apiCfg.handlerGetAllNotes)
-	//get notes :id (single note)
+	mux.HandleFunc("GET /api/notes/{noteID}", apiCfg.handlerGetSingleNote)
 	mux.HandleFunc("POST /api/createnote", apiCfg.handlerCreateNote)
 	//put notes :id
 	//delete notes :id
