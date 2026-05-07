@@ -71,6 +71,16 @@ Run the container:
 docker run --env-file .env -p 8085:8085 yournotes 
 ```
 
+## Docker Image
+
+Docker Hub: https://hub.docker.com/r/ananyabhardwaj10/yournotes
+
+### How to Run
+```bash
+docker pull ananyabhardwaj10/yournotes:latest
+docker run --env-file .env -p 8080:8080 ananyabhardwaj10/yournotes:latest
+```
+
 ## API Endpoints
 
 ### Auth
