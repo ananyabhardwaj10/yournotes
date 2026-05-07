@@ -48,13 +48,12 @@ func main() {
 	mux.HandleFunc("POST /api/register", apiCfg.handlerRegisterUser)
 	mux.HandleFunc("POST /api/login", apiCfg.handlerLoginUser)
 	mux.HandleFunc("POST /api/refresh", apiCfg.handlerRefreshTokens)
-	mux.HandleFunc("POST /api/revoke", apiCfg.handlerRevokeRefreshTokens)
-	
+	mux.HandleFunc("POST /api/revoke", apiCfg.handlerRevokeRefreshTokens)	
 	mux.HandleFunc("GET /api/notes", apiCfg.handlerGetAllNotes)
 	mux.HandleFunc("GET /api/notes/{noteID}", apiCfg.handlerGetSingleNote)
 	mux.HandleFunc("POST /api/createnote", apiCfg.handlerCreateNote)
 	mux.HandleFunc("PATCH /api/notes/{noteID}", apiCfg.handlerUpdateNote)
-	//delete notes :id
+	mux.HandleFunc("DELETE /api/notes/{noteID}", apiCfg.handlerDeleteNote)
 
 
 

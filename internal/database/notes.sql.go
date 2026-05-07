@@ -44,6 +44,21 @@ func (q *Queries) CreateNote(ctx context.Context, arg CreateNoteParams) (Note, e
 	return i, err
 }
 
+const deleteNote = `-- name: DeleteNote :exec
+DELETE FROM notes
+WHERE id = $1 AND user_id = $2
+`
+
+type DeleteNoteParams struct {
+	ID     uuid.UUID
+	UserID uuid.UUID
+}
+
+func (q *Queries) DeleteNote(ctx context.Context, arg DeleteNoteParams) error {
+	_, err := q.db.ExecContext(ctx, deleteNote, arg.ID, arg.UserID)
+	return err
+}
+
 const getNoteByID = `-- name: GetNoteByID :one
 SELECT id, created_at, updated_at, body, user_id, title FROM notes
 WHERE id = $1

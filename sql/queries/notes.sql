@@ -26,3 +26,7 @@ SET
   updated_at = NOW()
 WHERE id = sqlc.arg('id') AND user_id = sqlc.arg('user_id')
 RETURNING *;
+
+-- name: DeleteNote :exec
+DELETE FROM notes
+WHERE id = $1 AND user_id = $2;
