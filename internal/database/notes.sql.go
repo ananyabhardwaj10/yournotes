@@ -13,25 +13,32 @@ import (
 )
 
 const createNote = `-- name: CreateNote :one
-INSERT INTO notes (id, created_at, updated_at, title ,body, user_id)
+INSERT INTO notes (id, created_at, updated_at, title, body, user_id, is_pinned)
 VALUES (
     gen_random_uuid(),
     NOW(),
     NOW(),
     $1, 
     $2,
-    $3
-) RETURNING id, created_at, updated_at, body, user_id, title
+    $3,
+    $4
+) RETURNING id, created_at, updated_at, body, user_id, title, is_pinned
 `
 
 type CreateNoteParams struct {
-	Title  string
-	Body   string
-	UserID uuid.UUID
+	Title    string
+	Body     string
+	UserID   uuid.UUID
+	IsPinned bool
 }
 
 func (q *Queries) CreateNote(ctx context.Context, arg CreateNoteParams) (Note, error) {
-	row := q.db.QueryRowContext(ctx, createNote, arg.Title, arg.Body, arg.UserID)
+	row := q.db.QueryRowContext(ctx, createNote,
+		arg.Title,
+		arg.Body,
+		arg.UserID,
+		arg.IsPinned,
+	)
 	var i Note
 	err := row.Scan(
 		&i.ID,
@@ -40,6 +47,7 @@ func (q *Queries) CreateNote(ctx context.Context, arg CreateNoteParams) (Note, e
 		&i.Body,
 		&i.UserID,
 		&i.Title,
+		&i.IsPinned,
 	)
 	return i, err
 }
@@ -60,7 +68,7 @@ func (q *Queries) DeleteNote(ctx context.Context, arg DeleteNoteParams) error {
 }
 
 const getNoteByID = `-- name: GetNoteByID :one
-SELECT id, created_at, updated_at, body, user_id, title FROM notes
+SELECT id, created_at, updated_at, body, user_id, title, is_pinned FROM notes
 WHERE id = $1
 `
 
@@ -74,12 +82,13 @@ func (q *Queries) GetNoteByID(ctx context.Context, id uuid.UUID) (Note, error) {
 		&i.Body,
 		&i.UserID,
 		&i.Title,
+		&i.IsPinned,
 	)
 	return i, err
 }
 
 const getNotesByUserID = `-- name: GetNotesByUserID :many
-SELECT id, created_at, updated_at, body, user_id, title FROM notes
+SELECT id, created_at, updated_at, body, user_id, title, is_pinned FROM notes
 WHERE user_id = $1
 ORDER BY created_at DESC
 `
@@ -100,6 +109,7 @@ func (q *Queries) GetNotesByUserID(ctx context.Context, userID uuid.UUID) ([]Not
 			&i.Body,
 			&i.UserID,
 			&i.Title,
+			&i.IsPinned,
 		); err != nil {
 			return nil, err
 		}
@@ -119,22 +129,25 @@ UPDATE notes
 SET
   title = COALESCE($1, title),
   body = COALESCE($2, body),
+  is_pinned = COALESCE($3, is_pinned),
   updated_at = NOW()
-WHERE id = $3 AND user_id = $4
-RETURNING id, created_at, updated_at, body, user_id, title
+WHERE id = $4 AND user_id = $5
+RETURNING id, created_at, updated_at, body, user_id, title, is_pinned
 `
 
 type UpdateNoteParams struct {
-	Title  sql.NullString
-	Body   sql.NullString
-	ID     uuid.UUID
-	UserID uuid.UUID
+	Title    sql.NullString
+	Body     sql.NullString
+	IsPinned sql.NullBool
+	ID       uuid.UUID
+	UserID   uuid.UUID
 }
 
 func (q *Queries) UpdateNote(ctx context.Context, arg UpdateNoteParams) (Note, error) {
 	row := q.db.QueryRowContext(ctx, updateNote,
 		arg.Title,
 		arg.Body,
+		arg.IsPinned,
 		arg.ID,
 		arg.UserID,
 	)
@@ -146,6 +159,7 @@ func (q *Queries) UpdateNote(ctx context.Context, arg UpdateNoteParams) (Note, e
 		&i.Body,
 		&i.UserID,
 		&i.Title,
+		&i.IsPinned,
 	)
 	return i, err
 }

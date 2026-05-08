@@ -1,12 +1,13 @@
 -- name: CreateNote :one
-INSERT INTO notes (id, created_at, updated_at, title ,body, user_id)
+INSERT INTO notes (id, created_at, updated_at, title, body, user_id, is_pinned)
 VALUES (
     gen_random_uuid(),
     NOW(),
     NOW(),
     $1, 
     $2,
-    $3
+    $3,
+    $4
 ) RETURNING *;
 
 -- name: GetNotesByUserID :many
@@ -23,6 +24,7 @@ UPDATE notes
 SET
   title = COALESCE(sqlc.narg('title'), title),
   body = COALESCE(sqlc.narg('body'), body),
+  is_pinned = COALESCE(sqlc.narg('is_pinned'), is_pinned),
   updated_at = NOW()
 WHERE id = sqlc.arg('id') AND user_id = sqlc.arg('user_id')
 RETURNING *;

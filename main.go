@@ -45,13 +45,13 @@ func main() {
 		jwtSecretKey: jwtSecretKey,
 	}
 
-	mux.HandleFunc("POST /api/register", apiCfg.handlerRegisterUser)
-	mux.HandleFunc("POST /api/login", apiCfg.handlerLoginUser)
-	mux.HandleFunc("POST /api/refresh", apiCfg.handlerRefreshTokens)
-	mux.HandleFunc("POST /api/revoke", apiCfg.handlerRevokeRefreshTokens)	
+	mux.HandleFunc("POST /api/auth/register", apiCfg.handlerRegisterUser)
+	mux.HandleFunc("POST /api/auth/login", apiCfg.handlerLoginUser)
+	mux.HandleFunc("POST /api/auth/refresh", apiCfg.handlerRefreshTokens)
+	mux.HandleFunc("POST /api/auth/revoke", apiCfg.handlerRevokeRefreshTokens)	
 	mux.HandleFunc("GET /api/notes", apiCfg.handlerGetAllNotes)
 	mux.HandleFunc("GET /api/notes/{noteID}", apiCfg.handlerGetSingleNote)
-	mux.HandleFunc("POST /api/createnote", apiCfg.handlerCreateNote)
+	mux.HandleFunc("POST /api/notes", apiCfg.handlerCreateNote)
 	mux.HandleFunc("PATCH /api/notes/{noteID}", apiCfg.handlerUpdateNote)
 	mux.HandleFunc("DELETE /api/notes/{noteID}", apiCfg.handlerDeleteNote)
 

@@ -18,6 +18,7 @@ type Note struct {
 	Body      string
 	UserID    uuid.UUID
 	Title     string
+	IsPinned  bool
 }
 
 type RefreshToken struct {

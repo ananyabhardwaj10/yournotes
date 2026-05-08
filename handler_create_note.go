@@ -8,15 +8,18 @@ import (
 )
 
 type ResponseNote struct {
+	ID uuid.UUID `json:"id"`
 	UserID uuid.UUID `json:"userID"`
 	Title string `json:"title"`
 	Contents string `json:"contents"`
+	Pinned bool `json:"isPinned"`
 }
 
 func (cfg *apiConfig) handlerCreateNote(w http.ResponseWriter, req *http.Request) {
 	type parameters struct {
 		Title string `json:"title"`
 		Contents string `json:"contents"`
+		Pinned bool `json:"isPinned"`
 	}
 
 	params := parameters{}
@@ -44,6 +47,7 @@ func (cfg *apiConfig) handlerCreateNote(w http.ResponseWriter, req *http.Request
 		Title: params.Title, 
 		Body: params.Contents,
 		UserID: userID, 
+		IsPinned: params.Pinned,
 	})
 
 	if err != nil {
@@ -52,9 +56,11 @@ func (cfg *apiConfig) handlerCreateNote(w http.ResponseWriter, req *http.Request
 	}
 
 	respondWithJSON(w, http.StatusCreated, ResponseNote{
+		ID: note.ID,
 		UserID: userID,
 		Title: note.Title,
 		Contents: note.Body,
+		Pinned: note.IsPinned,
 	})
 
 }
