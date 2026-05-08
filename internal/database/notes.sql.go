@@ -12,6 +12,35 @@ import (
 	"github.com/google/uuid"
 )
 
+const checkPinnedUsingNoteIDandUserID = `-- name: CheckPinnedUsingNoteIDandUserID :one
+SELECT is_pinned FROM notes 
+WHERE user_id = $1 AND id = $2
+`
+
+type CheckPinnedUsingNoteIDandUserIDParams struct {
+	UserID uuid.UUID
+	ID     uuid.UUID
+}
+
+func (q *Queries) CheckPinnedUsingNoteIDandUserID(ctx context.Context, arg CheckPinnedUsingNoteIDandUserIDParams) (bool, error) {
+	row := q.db.QueryRowContext(ctx, checkPinnedUsingNoteIDandUserID, arg.UserID, arg.ID)
+	var is_pinned bool
+	err := row.Scan(&is_pinned)
+	return is_pinned, err
+}
+
+const countPinnedNotes = `-- name: CountPinnedNotes :one
+SELECT COUNT(*) FROM notes
+WHERE user_id = $1 AND is_pinned = TRUE
+`
+
+func (q *Queries) CountPinnedNotes(ctx context.Context, userID uuid.UUID) (int64, error) {
+	row := q.db.QueryRowContext(ctx, countPinnedNotes, userID)
+	var count int64
+	err := row.Scan(&count)
+	return count, err
+}
+
 const createNote = `-- name: CreateNote :one
 INSERT INTO notes (id, created_at, updated_at, title, body, user_id, is_pinned)
 VALUES (

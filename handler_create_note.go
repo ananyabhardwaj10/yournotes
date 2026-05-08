@@ -43,6 +43,19 @@ func (cfg *apiConfig) handlerCreateNote(w http.ResponseWriter, req *http.Request
 		return 
 	}
 
+	if params.Pinned {
+		pinCount, err := cfg.db.CountPinnedNotes(req.Context(), userID)
+		if err != nil {
+			respondWithError(w, http.StatusInternalServerError, "Error counting total pinned notes", err)
+			return 
+		}
+
+		if pinCount >= 3 {
+		respondWithError(w, http.StatusConflict, "Cannot Pin More than 3 notes", nil)
+		return 
+		}
+	}
+
 	note, err := cfg.db.CreateNote(req.Context(), database.CreateNoteParams{
 		Title: params.Title, 
 		Body: params.Contents,

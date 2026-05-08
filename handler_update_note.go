@@ -68,8 +68,31 @@ func (cfg *apiConfig) handlerUpdateNote(w http.ResponseWriter, req *http.Request
 	}
 
 	if params.Pinned != nil {
-		isPinned.Bool = true
+		isPinned.Bool = *params.Pinned
 		isPinned.Valid = true
+	}
+
+	pinnedAlready, err := cfg.db.CheckPinnedUsingNoteIDandUserID(req.Context(), database.CheckPinnedUsingNoteIDandUserIDParams{
+		ID: noteID,
+		UserID: userID,
+	})
+
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, "Unable to check if note is already pinned.", err)
+		return 
+	}
+
+	if params.Pinned != nil && !pinnedAlready && *params.Pinned {
+		pinCount, err := cfg.db.CountPinnedNotes(req.Context(), userID)
+		if err != nil {
+			respondWithError(w, http.StatusInternalServerError, "Error counting total pinned notes", err)
+			return 
+		}
+
+		if pinCount >= 3 {
+		respondWithError(w, http.StatusConflict, "Cannot Pin More than 3 notes", nil)
+		return 
+		}
 	}
 
 
@@ -78,6 +101,7 @@ func (cfg *apiConfig) handlerUpdateNote(w http.ResponseWriter, req *http.Request
 		UserID: userID,
 		Title: title,
 		Body: contents,
+		IsPinned: isPinned,
 	})
 
 	if err != nil {
@@ -92,6 +116,7 @@ func (cfg *apiConfig) handlerUpdateNote(w http.ResponseWriter, req *http.Request
 		Contents: note.Body,
 		CreatedAt: note.CreatedAt,
 		UpdatedAt: note.UpdatedAt,
+		Pinned: note.IsPinned,
 	})
 
 }

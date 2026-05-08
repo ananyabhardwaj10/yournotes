@@ -32,3 +32,11 @@ RETURNING *;
 -- name: DeleteNote :exec
 DELETE FROM notes
 WHERE id = $1 AND user_id = $2;
+
+-- name: CountPinnedNotes :one
+SELECT COUNT(*) FROM notes
+WHERE user_id = $1 AND is_pinned = TRUE;
+
+-- name: CheckPinnedUsingNoteIDandUserID :one
+SELECT is_pinned FROM notes 
+WHERE user_id = $1 AND id = $2;
