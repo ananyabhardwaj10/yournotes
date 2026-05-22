@@ -2,6 +2,10 @@
 
 YourNotes is a backend API for a notes application built with Go and PostgreSQL. It allows users to register, log in, manage authentication tokens, and create, read, update, and delete their own notes.
 
+## Motivation
+
+It solves the problem of securely managing and organizing user notes, while also serving as a practical system to implement core backend features like authentication and CRUD operations.
+
 ## Features
 
 - User registration
@@ -25,14 +29,16 @@ YourNotes is a backend API for a notes application built with Go and PostgreSQL.
 - JWT
 - Docker
 
-## Clone the Repository
+## Quick Start
+
+### Clone the Repository
 
 ```bash
 git clone https://github.com/ananyabhardwaj10/yournotes.git
 cd yournotes
 ``` 
 
-## Install Dependencies
+### Install Dependencies
 ```bash
 go mod tidy
 ```
@@ -49,8 +55,9 @@ you can generate the secret key using the command :
 ```bash 
 openssl rand -hex 32
 ```
+## Usage
 
-## Run the project locally
+### Run the project locally
 
 Make sure PostgreSQL is running and the database exists.
 
@@ -59,7 +66,7 @@ Run the server:
 go run . 
 ```
 
-## Run with Docker
+### Run with Docker
 
 Build the Docker image: 
 ```bash 
@@ -111,4 +118,8 @@ curl -X POST http://localhost:8085/api/login \
   -H "Content-Type: application/json" \
   -d '{"email":"ana@example.com","password":"secret123"}'
 ```
+
+## Contributing
+
+If there is anything that you think can be improved in this project, please raise a PR.
 
